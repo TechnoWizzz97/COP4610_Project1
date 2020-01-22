@@ -62,15 +62,6 @@ void shellFunc()
 			}
 			else
 			{
-				if (background != -1)
-				{
-					waitpid(pid, &status, WNOHANG);
-					QueueProcess(CreateProcessEntry(pid, -1, cmd));
-					//kill(pid, SIGSTOP);
-					//Need to implement a pause here for things like text editors
-				}
-				else
-					waitpid(pid, &status, 0);
 			}
 		}			
 	}
