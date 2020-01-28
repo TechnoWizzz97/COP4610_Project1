@@ -129,4 +129,3 @@ void clearInstruction(instruction* instr_ptr)
 	instr_ptr->tokens = NULL;
 	instr_ptr->numTokens = 0;
 }
-

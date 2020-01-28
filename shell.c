@@ -1,68 +1,139 @@
 #include "shell.h"
-void shellFunc()
+void runShell(instruction* ptr)
 {
-	int run = 1;
-	char* str;
-	char**argv;
-	startBackgroundProc();
-	while(run)
+	pid_t pid, wpid;
+	char * args = ptr->tokens;
+  int stat, fd0, fd1, i, fd[2];
+  int bg_flag = 0;
+  char buf;
+  //Child
+  if((p = fork()) == 0)
 	{
-		chkQueue();
-		printStartStr();
-		str = readUserInput();
-		argv = parseUserInput();
-		
-		if(argv[0] == NULL)
+    for(i = 0; args[i] != '\0'; i++)
 		{
-			//no arguments found
-		}
-		else if(errorCheck(argv))
-		{
-			printf("Error encountered when processing IO Redirect and/or Piping and/or Background process running");
-		}
-		else if(strcmp(argv[0], "exit")==0)
-		{
-			size_t argsArray = 0;
-			while (array[argsArray] != NULL)
+      //Input
+      if(strcmp(args[i],"<") == 0)
 			{
-					free(array[argsArray]);
-					++argsArray;
+				if(args[i+1] == NULL)
+				{
+				  fprintf(stderr, "Missing name for redirect\n");
+				  return 1;
+        }
+				else
+				{
+	  			if((fd0 = open(args[i+1], O_RDONLY)) < 0)
+					{
+            exit(0);
+          }
+					close(STDIN_FILENO);
+        }
+				dup2(fd0, 0);
+				close(fd0);
+      }
+      //Output
+      if(strcmp(args[i],">") == 0)
+			{
+				if(args[i+1] == NULL)
+				{
+          fprintf(stderr, "Missing name for redirect\n");
+          return 1;
+        }
+				else
+				{
+          if((fd1 = open(args[i+1], O_WRONLY | O_CREAT, 0644)) < 0)
+					{
+			    perror("cant open file\n");
+			    exit(0);
+	  		}
+				close(STDOUT_FILENO);
 			}
-			free(array);
-			printf("Detected exit statement and now exiting shell...\n");
-			waitProcessQueues();
-			exit(0);
-		}
-		else if(strcmp(argv[0], "cd") == 0)
+			dup2(fd1, STDOUT_FILENO);
+      close(fd1);
+    }
+      //Pipe
+    if(strcmp(args[i],"|") == 0)
 		{
-			size_t i;
-			for(i = 0; i != NULL; i++);
-			if(i <= 2)
+			pipe(fd);
+			if((p = fork()) == 0)
 			{
-				if(i == 2)directoryChange(argv[1]);
-				else directoryChange(getenv("HOME"));
-			}
-			else printf("Incorrect argument input, please try again...");
-		}
-		else if(executable(argv[0]) == TRUE)
-		{
-			int status;
-			pid_t pid = fork();
-			if (pid == -1)
-			{
-				printf("Error on fork\n");
-				exit(1);
-			}
-			else if (pid == 0)
-			{
-				execv(argv[0], argv);
-				printf("Trouble executing: \n");
-				PrintArgVector(argv);
-				exit(1);
-			}
+				close(STDOUT_FILENO);
+			  dup2(fd[1], 1);
+			  close(fd[0]);
+			  close(fd[1]);
+			  execvp(args[i-1], args);
+      }
 			else
 			{
+				close(STDIN_FILENO);
+			  dup2(fd[0], 0);
+			  close(fd[0]);
+			  close(fd[1]);
+			  execvp(args[i+1], args);
 			}
-		}			
-	}
+		}
+      if(strcmp(args[i], "&") == 0)
+			{
+				if(i != 0 && i == sizeof(args-1))
+				{
+      	  bg_flag = 1;
+	  			break;
+				}
+      }
+    }
+    if(execvp(args[0], args) == -1)
+		{
+      perror("shell");
+    }
+    exit(EXIT_FAILURE);
+  }
+  //Error
+  else if(p < 0)
+	{
+    perror("shell");
+  }
+  //Parent
+  else
+	{
+    bg_flag = 0;
+    for(i = 0; args[i] != '\0'; i++)
+		{
+      //Check if this is supposed to execute in the BG
+      if(strcmp(args[i], "&") == 0)
+			{
+        if (i != 0 && i ==(args_size - 1))
+				{
+          bg_flag = 1;
+          //printf("BG FLAG SET\n");
+          break;
+        }
+				else if (i != 0)
+				{
+	  			bg_flag = -1;
+	  			break;
+				}
+      }
+    }
+    //Foreground Execution
+    if (bg_flag==1)
+		{
+      do
+			{
+        wpidid = waitpid(p, &stat, WUNTRACED);
+      }while (!WIFEXITED(stat) && WIFSIGNALED(stat));
+    }
+    //Background Execution
+    else if (bg_flag == 0)
+		{
+      wpidid = waitpid(-1,&stat, WNOHANG);
+      printf("Background pid: %d\n", p);
+      if (wpid > 0)
+			{
+        printf("Completed Background pid: %d\n", wpid);
+      }
+    }
+    //Error Signal
+    else if (bg_flag == -1)
+		printf("Invalid Command\n");
+  }
+  return 1;
 }
