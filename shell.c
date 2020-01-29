@@ -12,27 +12,32 @@ void runShell(instruction* input)
 	pid_t pid, wpid;
 	char** args = input->tokens;
 	int stat, fd0, fd1, i, fd[2];
-	int bg_flag = 0;
-	char buf;
+	int bg_flag = 1;
+
 	int p = fork();
 	if(p  == 0)
 	{
     for(i = 0; args[i] != NULL; i++)
 		{
-      			//Input
+			if(strcmp(args[i], "exit") == 0)
+			{
+				exit(0);
+			}
+			//Input
       if(strcmp(args[i], "<") == 0)
 			{
 				if(args[i+1] == NULL)
 				{
 				  fprintf(stderr, "Missing name for redirect\n");
 				  return;
-       				}
+       	}
 				else
 				{
 	  			if((fd0 = open(args[i+1], O_RDONLY)) < 0)
 					{
            	exit(0);
           }
+					close(0);
         }
 				dup2(fd0, 0);
 				close(fd0);
@@ -52,6 +57,7 @@ void runShell(instruction* input)
 			    	perror("cant open file\n");
 			    	exit(0);
 	  			}
+					close(1);
 				}
 				dup2(fd1, STDOUT_FILENO);
       	close(fd1);
@@ -62,6 +68,7 @@ void runShell(instruction* input)
 				pipe(fd);
 				if((p = fork()) == 0)
 				{
+					close(1);
 			  	dup2(fd[1], 1);
 			  	close(fd[0]);
 			  	close(fd[1]);
@@ -69,13 +76,14 @@ void runShell(instruction* input)
       	}
 				else
 				{
+					close(0);
 			  	dup2(fd[0], 0);
 			  	close(fd[0]);
 			  	close(fd[1]);
 			  	execvp(args[i+1], args);
 				}
 			}
-      if(args[i] == 0)
+      if(strcmp(args[i], "&") == 0)
 			{
 				if(i != 0 && i == sizeof(args-1))
 				{
@@ -98,21 +106,20 @@ void runShell(instruction* input)
   //Parent
   else
 	{
-    bg_flag = 0;
+    bg_flag = 1;
     for(i = 0; args[i] != NULL; i++)
 		{
     	//Check if this is supposed to execute in the BG
     	if(strcmp(args[i], "&") == 0)
 			{
-        if (i != 0 && i ==(sizeof(args)-1))
+        if (i != 0 && i == strlen(*args)-1)
 				{
           bg_flag = 0;
-          break;
+					input->tokens[i] = " ";
         }
 				else if (i <= 0)
 				{
 	  			bg_flag = -1;
-	  			break;
 				}
       }
     }
@@ -137,5 +144,11 @@ void runShell(instruction* input)
   	//Error Signal
 		else if(bg_flag == -1) printf("Invalid Command\n");
   }
+	while(wpid <= 0) wpid = waitpid(-1,&stat, WNOHANG);
   return;
 }
+
+/*char** removeSpecialChar(char** tokes)
+{
+	for(int j = 0; )
+}*/

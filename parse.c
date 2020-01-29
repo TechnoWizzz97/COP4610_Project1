@@ -23,7 +23,7 @@ int main() {
 
 
 	while (1) {
-		printf("Please enter an instruction: ");
+		printf("\nPlease enter an instruction: ");
 
 		// loop reads character sequences separated by whitespace
 		do {
