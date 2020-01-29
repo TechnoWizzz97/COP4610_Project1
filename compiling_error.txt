@@ -1,0 +1,11 @@
+/home/kio/COP4610_Assignments/COP4610_Project1/shell.c: In function ‘runShell’:
+/home/kio/COP4610_Assignments/COP4610_Project1/shell.c:27:14: warning: passing argument 1 of ‘printf’ from incompatible pointer type [-Wincompatible-pointer-types]
+       printf(stderr, "Missing name for redirect\n");
+              ^~~~~~
+In file included from /home/kio/COP4610_Assignments/COP4610_Project1/shell.c:2:0:
+/usr/include/stdio.h:318:12: note: expected ‘const char * restrict’ but argument is of type ‘struct _IO_FILE *’
+ extern int printf (const char *__restrict __format, ...);
+            ^~~~~~
+/home/kio/COP4610_Assignments/COP4610_Project1/shell.c:78:18: error: expected expression before ‘]’ token
+          if(args[] == 0)
+                  ^

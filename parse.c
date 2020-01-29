@@ -8,12 +8,6 @@
 #include <stdlib.h>
 #include "shell.h"
 
-typedef struct
-{
-	char** tokens;
-	int numTokens;
-} instruction;
-
 void addToken(instruction* instr_ptr, char* tok);
 void printTokens(instruction* instr_ptr);
 void clearInstruction(instruction* instr_ptr);
@@ -74,7 +68,7 @@ int main() {
 
 		addNull(&instr);
 		printTokens(&instr);
-		runShell(instr->tokens);
+		runShell(&instr);
 		clearInstruction(&instr);
 	}
 

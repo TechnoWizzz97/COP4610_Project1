@@ -4,8 +4,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "shell.c"
 
-void runShell(char* input);
+typedef struct
+{
+	char** tokens;
+	int numTokens;
+} instruction;
+
+void runShell(instruction* input);
 
 #endif
