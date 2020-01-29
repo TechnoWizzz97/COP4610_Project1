@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "shell.c"
+#include "shell.h"
 
 typedef struct
 {
@@ -74,6 +74,7 @@ int main() {
 
 		addNull(&instr);
 		printTokens(&instr);
+		runShell(instr->tokens);
 		clearInstruction(&instr);
 	}
 
@@ -122,8 +123,7 @@ void printTokens(instruction* instr_ptr)
 void clearInstruction(instruction* instr_ptr)
 {
 	int i;
-	for (i = 0; i < instr_ptr->numTokens; i++)
-		free(instr_ptr->tokens[i]);
+	for (i = 0; i < instr_ptr->numTokens; i++) free(instr_ptr->tokens[i]);
 
 	free(instr_ptr->tokens);
 
