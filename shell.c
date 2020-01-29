@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "parse.c"
 void runShell(instruction* ptr)
 {
 	pid_t pid, wpid;
