@@ -8,3 +8,6 @@ OBJ = shell.o parse.o
 
 simpleShell: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
+
+clean:
+	rm *.o simpleShell 
