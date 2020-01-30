@@ -1,4 +1,9 @@
-char* BuildPath(char* str)
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include "pathresolution.h"
+
+char* BuildPath(char*)
 {
 	char* ret_str = str;
 
@@ -90,7 +95,8 @@ char* BuildPath(char* str)
 
 	return ret_str;
 }
-char* ReplaceSubStr(char* dest, size_t start, size_t end, const char* source)
+
+char* ReplaceSubStr(char*, size_t, size_t, const char*)
 {
 	size_t deletion_len = end - start + 1;
 	size_t dest_len = strlen(dest);
@@ -203,4 +209,16 @@ char** ArrayRemoveElement(char** argv, int index)
 	new_argv[it2] = NULL;
 	BigFree(argv);
 	return new_argv;
+}
+
+void BigFree(char** array)
+{
+	size_t it = 0;
+
+	while (array[it] != NULL)
+	{
+			free(array[it]);
+			++it;
+	}
+	free(array);
 }

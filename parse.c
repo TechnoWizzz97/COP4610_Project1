@@ -7,13 +7,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include "shell.h"
+#include "pathresolution.h"
 
 void addToken(instruction* instr_ptr, char* tok);
 void printTokens(instruction* instr_ptr);
 void clearInstruction(instruction* instr_ptr);
 void addNull(instruction* instr_ptr);
 
-int main() {
+int main()
+{
 	char* token = NULL;
 	char* temp = NULL;
 
@@ -22,8 +24,9 @@ int main() {
 	instr.numTokens = 0;
 
 
-	while (1) {
-		printf("\nPlease enter an instruction: ");
+	while (1)
+	{
+		printf("Please enter an instruction: ");
 
 		// loop reads character sequences separated by whitespace
 		do {
@@ -33,10 +36,13 @@ int main() {
 
 			int i;
 			int start = 0;
-			for (i = 0; i < strlen(token); i++) {
-				//pull out special characters and make them into a separate token in the instruction
-				if (token[i] == '|' || token[i] == '>' || token[i] == '<' || token[i] == '&') {
-					if (i-start > 0) {
+			for (i = 0; i < strlen(token); i++)
+			{
+				//pull out  characters and make them into a separate token in the instruction
+				if (token[i] == '|' || token[i] == '>' || token[i] == '<' || token[i] == '&')
+				{
+					if (i-start > 0)
+					{
 						memcpy(temp, token + start, i - start);
 						temp[i-start] = '\0';
 						addToken(&instr, temp);
@@ -52,7 +58,8 @@ int main() {
 				}
 			}
 
-			if (start < strlen(token)) {
+			if (start < strlen(token))
+			{
 				memcpy(temp, token + start, strlen(token) - start);
 				temp[i-start] = '\0';
 				addToken(&instr, temp);

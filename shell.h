@@ -1,5 +1,5 @@
-#if !defined( EXAMPLE_H )
-#define EXAMPLE_H
+#if !defined( SHELL_H )
+#define SHELL_H
 
 #include <stdlib.h>
 #include <stdio.h>

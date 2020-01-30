@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include "shell.h"
+#include "pathresolution.h"
 
 void runShell(instruction* input)
 {
@@ -14,12 +15,12 @@ void runShell(instruction* input)
 	int stat, fd0, fd1, i, fd[2];
 	int bg_flag = 1;
 	char*  exitStr = "exit";
-	if(args != (char*) NULL)
+	if(args != NULL)
 	{
 		int p = fork();
 		if(p  == 0)
 		{
-	    for(i = 0; args[i] != '\0'; i++)
+	    for(i = 0; args[i] != NULL; i++)
 			{
 				if(args[i] == "exit")
 				{
@@ -27,7 +28,7 @@ void runShell(instruction* input)
 				}
 	      if(args[i] == "<")
 				{
-					if(args[i+1] == '\0')
+					if(args[i+1] == NULL)
 					{
 					  fprintf(stderr, "Missing name for redirect\n");
 					  return;
@@ -46,7 +47,7 @@ void runShell(instruction* input)
 	  		//Output
 	      if(args[i] == ">")
 				{
-					if(args[i+1] == '\0')
+					if(args[i+1] == NULL)
 					{
 	          fprintf(stderr, "Missing name for redirect\n");
 	        	return;
@@ -108,12 +109,12 @@ void runShell(instruction* input)
 	  else
 		{
 	    bg_flag = 1;
-	    for(i = 0; args[i] != (char*)'\0'; i++)
+	    for(i = 0; args[i] != (char*)NULL; i++)
 			{
 	    	//Check if this is supposed to execute in the BG
 	    	if(strcmp(args[i], "&") == 0)
 				{
-	        if (i != 0 && i == strlen(args)-1)
+	        if (i != 0 && i == strlen(*args)-1)
 					{
 	          bg_flag = 0;
 						input->tokens[i] = " ";
